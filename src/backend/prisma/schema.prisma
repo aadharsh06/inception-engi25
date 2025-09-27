@@ -1,3 +1,12 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Make sure this matches the variable name in your .env
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
 enum InvestmentExperience {
   BEGINNER
   INTERMEDIATE

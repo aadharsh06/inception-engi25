@@ -1,5 +1,5 @@
-import { ApiError } from "../utils/apierror";
-import { asyncHandler } from "../utils/asynchandler";
+import { ApiError } from "../utils/apierror.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 

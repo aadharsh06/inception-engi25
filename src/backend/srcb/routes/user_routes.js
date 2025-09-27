@@ -7,7 +7,7 @@ import {
   refreshAccessToken,
   registerUser,
   updateUserDetails,
-} from "../controllers/user_controller.js";
+} from "../controllers/user_controllers.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const userRouter = Router();

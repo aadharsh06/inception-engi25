@@ -16,6 +16,8 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/themes": "^3.2.1",
     "@tailwindcss/vite": "^4.1.13",
+    "axios": "^1.12.2",
+    "axois": "^0.0.1-security",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
@@ -24,7 +26,8 @@
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
