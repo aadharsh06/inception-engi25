@@ -1,0 +1,1 @@
+// Devansh pls connect SUPABASE here and export a connectToDB function from this file

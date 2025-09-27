@@ -1,0 +1,78 @@
+enum InvestmentExperience {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum GoalType {
+  RETIREMENT
+  LONG_TERM
+  SHORT_TERM
+}
+
+enum Tolerance {
+  LOW
+  MODERATE
+  HIGH
+}
+
+model User {
+  id                     Int           @id @default(autoincrement())
+  createdAt              DateTime      @default(now())
+  email                  String        @unique
+  username               String        @unique
+  password               String
+  age                    Int
+  location               String
+  occupation             String
+  investment_experience  InvestmentExperience
+  refreshToken           String?       @unique
+  sessions               Session[]
+  portfolios             Portfolio[]
+}
+
+model Session {
+  id                     Int              @id @default(autoincrement())
+  createdAt              DateTime         @default(now())
+  goal_type              GoalType
+  target_amount          Float
+  target_years           Int
+  risk_tolerance         Tolerance
+  volatility_tolerance   Tolerance
+  userId                 Int
+  user                   User             @relation(fields: [userId], references: [id])
+  investmentPrefs        InvestmentPrefs  @relation(fields: [investmentPrefsId], references: [id])
+  investmentPrefsId      Int   @unique
+  capital                Capital          @relation(fields: [capitalId], references: [id])
+  capitalId              Int   @unique
+  portfolios             Portfolio[]
+}
+
+model Portfolio {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  sessionId     Int
+  session       Session  @relation(fields: [sessionId], references: [id])
+  portfolioJSON Json
+  riskProfile   String
+}
+
+model InvestmentPrefs {
+  id                Int       @id @default(autoincrement())
+  createdAt         DateTime  @default(now())
+  portfolio_style   String
+  preferred_sectors String[]
+  excluded_sectors  String[]
+  session           Session?
+}
+
+model Capital {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  initial_investment Float
+  liquidity          Float
+  session            Session?
+}
