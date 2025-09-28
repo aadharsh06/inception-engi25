@@ -7,6 +7,7 @@ import {
   refreshAccessToken,
   registerUser,
   updateUserDetails,
+  getInvestmentPrefsByEmail,
 } from "../controllers/user_controllers.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -18,7 +19,8 @@ userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/refreshToken").post(refreshAccessToken);
 userRouter.route("/change-password").post(verifyJWT, changeCurrentPassword);
 userRouter.route("/get-user").get(verifyJWT, getUser);
-userRouter.route("/update-user-details").patch(verifyJWT, updateUserDetails);
+userRouter.route("/update-user-details").patch(verifyJWT,updateUserDetails);
+userRouter.route("/get-investment-prefs-by-email").get(verifyJWT, getInvestmentPrefsByEmail);
 
 
 export { userRouter };

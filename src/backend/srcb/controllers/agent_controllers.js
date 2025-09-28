@@ -4,16 +4,18 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import axios from 'axios';
 
 const chatAgent = asyncHandler(async (req, res) => {
-  const { sessionId, userId, message, initialPreferenceData } = req.body;
-
+  const { sessionId, userId, data } = req.body;
+  const { message, initialPreferenceData } = data || {};
+  console.log(initialPreferenceData);
   if (!sessionId || !userId || !message) {
+    
     throw new ApiError(400, "Session ID, User ID, and message are required");
   }
 
   try {
    
     const flaskResponse = await axios.post(
-      process.env.FLASK_AGENT_URL || "http://127.0.0.1:8000/agent/chat", 
+       "http://127.0.0.1:8000/agent/chat", 
       {
         sessionId,
         userId,
@@ -28,14 +30,12 @@ const chatAgent = asyncHandler(async (req, res) => {
         },
       }
     );
-
   
     res.status(flaskResponse.status).json(new ApiResponse(flaskResponse.status, flaskResponse.data.message || flaskResponse.data, "Agent chat response successfully proxied"));
 
   } catch (error) {
     if (error.response) {
       // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       throw new ApiError(error.response.status, error.response.data.message || "Flask agent error");
     } else if (error.request) {
      

@@ -7,7 +7,9 @@ const prisma = new PrismaClient();
 
 export const verifyJWT=asyncHandler( async (req,res,next) => {
 try {
- const token=req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+  const token=req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+
+
  if(!token) {
   throw new ApiError(401,"JWT token not received.")
  }
@@ -16,9 +18,6 @@ try {
   where: {
     id: decodedToken?.id,
   },
- }).select({
-  password: false,
-  refreshToken: false,
  });
  if (!user) throw new ApiError(401, "JWT verification failed.");
  req.user = user;

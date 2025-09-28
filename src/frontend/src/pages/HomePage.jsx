@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Import Cookies
 
 const Avatar = ({ children, className = '' }) => (
   <div className={`relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full ${className}`}>{children}</div>
@@ -39,9 +40,11 @@ const HomePage = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingUser, setIsFetchingUser] = useState(true);
+  const [userInvestmentPrefs, setUserInvestmentPrefs] = useState(null); // New state for preferences
   const chatEndRef = useRef(null);
 
   const backendUrl = 'http://localhost:3000';
+  const fastApiUrl = 'http://127.0.0.1:8000'; // FastAPI agent URL
 
   useEffect(() => {
   const fetchUser = async () => {
@@ -58,6 +61,27 @@ const HomePage = () => {
   };
   fetchUser();
 }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      const fetchUserPreferences = async () => {
+        try {
+          const userEmail = Cookies.get('userEmail');
+          if (!userEmail) {
+            console.warn("User email not found in cookies. Cannot fetch preferences.");
+            return;
+          }
+          const response = await axios.get(`${backendUrl}/api/user/get-investment-prefs-by-email?email=${userEmail}`, { withCredentials: true });
+          setUserInvestmentPrefs(response.data.data);
+          console.log("User preferences fetched:", response.data.data);
+        } catch (error) {
+          console.error("Error fetching user preferences:", error);
+          setUserInvestmentPrefs(null); // Ensure null on error
+        }
+      };
+      fetchUserPreferences();
+    }
+  }, [user?.id, backendUrl]); // Dependency on user.id and backendUrl
 
   useEffect(() => {
     setTimeout(() => {
@@ -112,14 +136,16 @@ const startNewChat = () => {
         liquidity: 5000
       };
 
-      const response = await axios.post(`${backendUrl}/api/agent/chat`, {
+      const response = await axios.post(`${fastApiUrl}/agent/chat`, {
         sessionId: activeSessionId,
         userId: user.id,
-        message: inputMessage,
-        initialPreferenceData: currentMessages.length === 1 ? initialPreferenceData : null,
+        data: {
+          message: inputMessage,
+          initialPreferenceData: currentMessages.length === 1 ? userInvestmentPrefs : null,
+        },
       }, { withCredentials: true });
 
-      const agentMessageText = response.data?.data?.message || "Sorry, I received an unexpected response.";
+      const agentMessageText = response.data?.response || "Sorry, I received an unexpected response.";
       const agentMessage = { sender: 'agent', text: agentMessageText };
       const finalMessages = [...currentMessages, agentMessage];
       setMessages(finalMessages);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Import Cookies
 
 const Card = ({ children, className = '' }) => (<div className={className}>{children}</div>);
 const CardHeader = ({ children, className = '' }) => (<div className={className}>{children}</div>);
@@ -39,7 +40,8 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         console.log("Login successful:", response.data);
-        window.location.href = '/home';
+        Cookies.set('userEmail', formData.email); // Store email in cookie
+        window.location.href = '/preferences';
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Login failed. Please check your credentials.";

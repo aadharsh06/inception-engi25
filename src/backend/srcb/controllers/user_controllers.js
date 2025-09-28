@@ -24,6 +24,7 @@ const generateRefreshToken = (userId) => {
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 };
 
 const registerUser = asyncHandler(async (req, res, next) => {
@@ -51,10 +52,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
-        age: 0,
-        location: "Not provided",
-        occupation: "Not provided",
-        investment_experience: "BEGINNER",
       },
     });
     
@@ -191,25 +188,126 @@ const getUser = asyncHandler(async (req, res, next) => {
           throw new ApiError(404, "User not found");
         }
         const { password: _, ...userWithoutPassword } = req.user;
-        return res.status(200).json(new ApiResponse(200, userWithoutPassword, "User fetched successfully"));
+        return res.status(200).json(new ApiResponse( userWithoutPassword, 200, "User fetched successfully"));
     } catch(error) {
         next(error);
     }
 });
-
 const updateUserDetails = asyncHandler(async (req, res, next) => {
-    try {
-        const { username, email, age, location, occupation, investment_experience } = req.body;
-        const updatedUser = await prisma.user.update({
-          where: { id: req.user.id },
-          data: { username, email, age, location, occupation, investment_experience },
-        });
-        const { password: _, ...userWithoutPassword } = updatedUser;
-        return res.status(200).json(new ApiResponse(200, userWithoutPassword, "User details updated successfully"));
-    } catch(error) {
-        next(error);
+  try {
+    const userId = req.user.id;
+    const { email, investmentPrefs } = req.body;
+
+    if (!investmentPrefs) {
+      return res.status(400).json({ message: "investmentPrefs missing" });
     }
+
+    
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { email },
+    });
+
+   
+    const {
+      age,
+      location,
+      occupation,
+      investment_experience,
+      goal_type,
+      target_amount,
+      target_years,
+      risk_tolerance,
+      volatility_tolerance,
+      initial_investment,
+      liquidity_needs_percentage,
+      preferred_sectors,
+      excluded_sectors,
+      portfolioStyle,
+    } = investmentPrefs;
+
+    const upsertPrefs = await prisma.investmentPrefs.upsert({
+      where: { userId },
+      create: {
+        userId,
+        portfolio_style: portfolioStyle,
+        age: parseInt(age),
+        location,
+        occupation,
+        investment_experience: investment_experience.toUpperCase(),
+        goal_type: goal_type.toUpperCase(),
+        target_amount: parseFloat(target_amount),
+        target_years: parseInt(target_years),
+        risk_tolerance: risk_tolerance.toUpperCase(),
+        volatility_tolerance: volatility_tolerance.toUpperCase(),
+        initial_investment: parseFloat(initial_investment),
+        liquidity_needs_percentage: parseFloat(liquidity_needs_percentage),
+        preferred_sectors: Array.isArray(preferred_sectors)
+          ? preferred_sectors
+          : (preferred_sectors?.split(",").map(s => s.trim()) || []),
+        excluded_sectors: Array.isArray(excluded_sectors)
+          ? excluded_sectors
+          : (excluded_sectors?.split(",").map(s => s.trim()) || []),
+      },
+      update: {
+        portfolio_style: portfolioStyle,
+        age: parseInt(age),
+        location,
+        occupation,
+        investment_experience: investment_experience.toUpperCase(),
+        goal_type: goal_type.toUpperCase(),
+        target_amount: parseFloat(target_amount),
+        target_years: parseInt(target_years),
+        risk_tolerance: risk_tolerance.toUpperCase(),
+        volatility_tolerance: volatility_tolerance.toUpperCase(),
+        initial_investment: parseFloat(initial_investment),
+        liquidity_needs_percentage: parseFloat(liquidity_needs_percentage),
+        preferred_sectors: Array.isArray(preferred_sectors)
+          ? preferred_sectors
+          : (preferred_sectors?.split(",").map(s => s.trim()) || []),
+        excluded_sectors: Array.isArray(excluded_sectors)
+          ? excluded_sectors
+          : (excluded_sectors?.split(",").map(s => s.trim()) || []),
+      },
+    });
+
+    return res.status(200).json({
+      message: "User details and preferences updated successfully",
+      user: { ...updatedUser, investmentPrefs: upsertPrefs },
+    });
+  } catch (error) {
+    console.error("Update user details error:", error);
+    next(error);
+  }
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getUser, updateUserDetails };
+const getInvestmentPrefsByEmail = asyncHandler(async (req, res, next) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      throw new ApiError(400, "Email is required to fetch preferences.");
+    }
+
+    const userWithPrefs = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        investmentPrefs: true,
+      },
+    });
+
+    if (!userWithPrefs || !userWithPrefs.investmentPrefs) {
+      // If user exists but no preferences, return null or an empty object for preferences
+      return res.status(200).json(new ApiResponse(200, null, "User found, but no investment preferences set."));
+    }
+
+    return res.status(200).json(new ApiResponse(200, userWithPrefs.investmentPrefs, "Investment preferences fetched successfully."));
+  } catch (error) {
+    next(error);
+  }
+});
+
+        
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getUser, updateUserDetails, getInvestmentPrefsByEmail };
 
