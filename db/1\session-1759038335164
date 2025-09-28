@@ -1,0 +1,37 @@
+{
+  "portfolio_summary": {
+    "total_investment": 100.0,
+    "expected_annual_return": 12.0,
+    "risk_level": "MEDIUM",
+    "max_drawdown": 20.0
+  },
+  "allocations": [
+    {
+      "asset": "Axis NIFTY Healthcare ETF",
+      "sector": "Healthcare",
+      "allocation_percentage": 30.0
+    },
+    {
+      "asset": "Nippon India ETF Nifty 50 BeES",
+      "sector": "Equity",
+      "allocation_percentage": 40.0
+    },
+    {
+      "asset": "Bharat Bond ETF",
+      "sector": "Debt",
+      "allocation_percentage": 20.0
+    },
+    {
+      "asset": "Gold ETF",
+      "sector": "Commodities",
+      "allocation_percentage": 10.0
+    }
+  ],
+  "sector_allocation": {
+    "Healthcare": 30.0,
+    "Equity": 40.0,
+    "Debt": 20.0,
+    "Commodities": 10.0
+  },
+  "strategy": "A diversified portfolio focusing on long-term growth with a preference for the Healthcare sector, suitable for a beginner investor with medium risk tolerance in India."
+}

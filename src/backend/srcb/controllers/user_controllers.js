@@ -298,10 +298,10 @@ const getInvestmentPrefsByEmail = asyncHandler(async (req, res, next) => {
 
     if (!userWithPrefs || !userWithPrefs.investmentPrefs) {
       // If user exists but no preferences, return null or an empty object for preferences
-      return res.status(200).json(new ApiResponse(200, null, "User found, but no investment preferences set."));
+      return res.status(200).json(new ApiResponse(null,200, "User found, but no investment preferences set."));
     }
 
-    return res.status(200).json(new ApiResponse(200, userWithPrefs.investmentPrefs, "Investment preferences fetched successfully."));
+    return res.status(200).json(new ApiResponse( userWithPrefs.investmentPrefs,200, "Investment preferences fetched successfully."));
   } catch (error) {
     next(error);
   }

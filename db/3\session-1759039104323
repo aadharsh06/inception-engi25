@@ -1,0 +1,53 @@
+{
+  "portfolio_summary": {
+    "total_investment": 1000.0,
+    "expected_annual_return": 0.12,
+    "risk_level": "Low",
+    "max_drawdown": 0.1
+  },
+  "allocations": [
+    {
+      "asset": "Mirae Asset Healthcare ETF",
+      "sector": "Healthcare",
+      "allocation_percentage": 0.25
+    },
+    {
+      "asset": "Nifty 50 ETF",
+      "sector": "Diversified",
+      "allocation_percentage": 0.20
+    },
+    {
+      "asset": "Apollo Hospitals Enterprise Ltd",
+      "sector": "Healthcare",
+      "allocation_percentage": 0.15
+    },
+    {
+      "asset": "Max Healthcare Institute Ltd",
+      "sector": "Healthcare",
+      "allocation_percentage": 0.10
+    },
+    {
+      "asset": "Gold ETF",
+      "sector": "Commodities",
+      "allocation_percentage": 0.10
+    },
+    {
+      "asset": "Indian Government Bonds",
+      "sector": "Fixed Income",
+      "allocation_percentage": 0.10
+    },
+    {
+      "asset": "Cash",
+      "sector": "Cash",
+      "allocation_percentage": 0.10
+    }
+  ],
+  "sector_allocation": {
+    "Healthcare": 0.50,
+    "Diversified": 0.20,
+    "Commodities": 0.10,
+    "Fixed Income": 0.10,
+    "Cash": 0.10
+  },
+  "strategy": "This portfolio is designed for an 18-year-old software engineer in India with a short-term goal and low-risk tolerance. It focuses on a mix of equities, bonds, and commodities with a tilt towards the preferred healthcare sector. The strategy prioritizes capital preservation and steady growth over a 5-year period."
+}

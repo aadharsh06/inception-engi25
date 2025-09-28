@@ -14,6 +14,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userEmailFromCookie, setUserEmailFromCookie] = useState(null); // State to hold email from cookie
+  const [userInvestmentPrefs, setUserInvestmentPrefs] = useState(null); // New state for investment preferences
 
   useEffect(() => {
     const emailFromCookie = Cookies.get('userEmail');
@@ -23,11 +24,22 @@ const ProfilePage = () => {
 
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('/api/user/get-user', { withCredentials: true });
-        console.log(response.data);
-        setUser(response.data.data); 
+        // Fetch basic user data
+        const userResponse = await axios.get('/api/user/get-user', { withCredentials: true });
+        const fetchedUser = userResponse.data.data;
+        
+        // Fetch investment preferences if email is available
+        if (emailFromCookie) {
+          const prefsResponse = await axios.get(`/api/user/get-investment-prefs-by-email?email=${emailFromCookie}`, { withCredentials: true });
+          setUserInvestmentPrefs(prefsResponse.data.data);
+          // Merge investment preferences into the user object for easier display
+          setUser({ ...fetchedUser, ...prefsResponse.data.data });
+        } else {
+          setUser(fetchedUser); // Set user without preferences if email is not available
+        }
+
       } catch (err) {
-        console.error("Failed to fetch user data:", err);
+        console.error("Failed to fetch user data or preferences:", err);
         setError("Failed to load user data.");
         navigate('/login'); // Redirect to login if fetching fails (e.g., not authenticated)
       } finally {
@@ -101,7 +113,7 @@ const ProfilePage = () => {
               <Label className="text-lg font-semibold">Investment Experience:</Label>
               <p className="text-muted-foreground text-base">{user.investment_experience}</p>
             </div>
-            {/* Add more user details here as needed */}
+         
           </CardContent>
           <div className="p-6 pt-0 flex justify-center">
          

@@ -32,6 +32,49 @@ const Input = React.forwardRef(({ className, ...props }, ref) => (
   <input className={`flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-black ${className}`} ref={ref} {...props} />
 ));
 
+// Helper component to display formatted JSON or plain text
+const FormattedAgentResponse = ({ content, indent = 0 }) => {
+  const indentation = { marginLeft: `${indent * 16}px` }; // 16px per indent level
+
+  if (typeof content === 'string') {
+    return <p style={indentation} className="whitespace-pre-wrap">{content}</p>;
+  }
+
+  if (typeof content === 'object' && content !== null) {
+    return (
+      <div style={indentation}>
+        {Object.entries(content).map(([key, value]) => (
+          <div key={key}>
+            <span className="font-semibold">{key}: </span>
+            {typeof value === 'object' && value !== null && !Array.isArray(value) ? (
+              // Render nested objects
+              <FormattedAgentResponse content={value} indent={indent + 1} />
+            ) : Array.isArray(value) ? (
+              // Render arrays
+              <div style={{ marginLeft: `${(indent + 1) * 16}px` }}>
+                {value.map((item, index) => (
+                  <div key={index}>
+                    {typeof item === 'object' && item !== null ? (
+                      <FormattedAgentResponse content={item} indent={indent + 1} />
+                    ) : (
+                      <p>{item?.toLocaleString ? item.toLocaleString() : String(item)}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Render primitive values
+              <p className="inline">{value?.toLocaleString ? value.toLocaleString() : String(value)}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null; // Should not happen for valid content
+};
+
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [sessions, setSessions] = useState([]);
@@ -56,7 +99,10 @@ const HomePage = () => {
       setUser({ id: 'mock-123', username: 'Devansh' });
     } finally {
       setIsFetchingUser(false);
-      startNewChat();
+     
+      if (!activeSessionId) {
+        startNewChat();
+      }
     }
   };
   fetchUser();
@@ -144,9 +190,20 @@ const startNewChat = () => {
           initialPreferenceData: currentMessages.length === 1 ? userInvestmentPrefs : null,
         },
       }, { withCredentials: true });
+     console.log(response);
+      let agentMessageText = response.data?.response || "Sorry, I received an unexpected response.";
+      
+      // Attempt to parse the JSON response
+      let parsedAgentResponse;
+      try {
+        parsedAgentResponse = JSON.parse(agentMessageText);
+      } catch (parseError) {
+        console.warn("Could not parse agent response as JSON:", parseError);
+        // If parsing fails, keep the original text
+        parsedAgentResponse = agentMessageText;
+      }
 
-      const agentMessageText = response.data?.response || "Sorry, I received an unexpected response.";
-      const agentMessage = { sender: 'agent', text: agentMessageText };
+      const agentMessage = { sender: 'agent', text: parsedAgentResponse };
       const finalMessages = [...currentMessages, agentMessage];
       setMessages(finalMessages);
 
@@ -158,6 +215,9 @@ const startNewChat = () => {
 
     } catch (error) {
       console.error("Error sending message:", error);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response status:", error.response?.status);
+      console.error("Error message:", error.message);
       setMessages(prev => [...prev, { sender: 'agent', text: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
       setIsLoading(false);
@@ -185,14 +245,14 @@ const startNewChat = () => {
   }
 
   return (
-    <div className="flex flex-col w-screen h-screen bg-white text-black">
-      <nav className="flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm">
-        <a href="/" className="text-2xl font-bold text-black">AI Assistant</a>
+    <div className="flex flex-col w-screen h-screen bg-gradient-to-br from-purple-100 to-blue-200 text-gray-900 overflow-hidden">
+      <nav className="flex items-center justify-between p-4 border-b border-gray-300 bg-white/70 backdrop-blur-md shadow-sm">
+        <a href="/" className="text-3xl font-extrabold text-indigo-700 tracking-tight">AI Assistant</a>
         <div className="flex items-center space-x-4">
-          {user && <span className="font-semibold hidden sm:inline">Welcome, {user.username}!</span>}
-          <Button variant="outline" size="sm" onClick={handleLogout}>Logout</Button>
+          {user && <span className="font-semibold hidden sm:inline text-lg text-gray-800">Welcome, {user.username}!</span>}
+          <Button variant="outline" size="sm" onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white border-transparent">Logout</Button>
           <a href="/profile">
-            <Avatar>
+            <Avatar className="ring-2 ring-indigo-500 hover:ring-indigo-700 transition-all">
               {user?.username ? (
                 <AvatarImage
                   src={`https://api.dicebear.com/8.x/initials/svg?seed=${user.username}`}
@@ -200,7 +260,7 @@ const startNewChat = () => {
                   onError={(e) => e.target.style.display = 'none'}
                 />
               ) : (
-                <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                <AvatarFallback className="bg-indigo-200 text-indigo-800 text-xl">{user?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
               )}
             </Avatar>
           </a>
@@ -208,46 +268,50 @@ const startNewChat = () => {
       </nav>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-64 border-r border-gray-200 bg-white p-4 flex flex-col space-y-4 overflow-y-auto">
-          <h2 className="text-lg font-semibold">Sessions</h2>
-          <div className="flex flex-col space-y-2">
+        <aside className="w-64 border-r border-gray-300 bg-white/70 backdrop-blur-md p-4 flex flex-col space-y-6 overflow-y-auto shadow-inner">
+          <h2 className="text-xl font-bold text-indigo-700 mb-2">Sessions</h2>
+          <div className="flex flex-col space-y-3">
             {sessions.map((session) => (
               <div key={session.id} onClick={() => switchSession(session.id)}
-                   className={`p-2 rounded-md cursor-pointer text-sm truncate ${activeSessionId === session.id ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100'}`}>
+                   className={`p-3 rounded-lg cursor-pointer text-base truncate transition-all duration-200 ${activeSessionId === session.id ? 'bg-indigo-100 text-indigo-800 font-semibold shadow-md' : 'hover:bg-gray-100 text-gray-700'}`}>
                 {session.name}
               </div>
             ))}
           </div>
-          <div className="mt-auto">
-            <Button variant="secondary" className="w-full" onClick={startNewChat}>+ New Session</Button>
+          <div className="mt-auto pt-4">
+            <Button variant="secondary" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-lg" onClick={startNewChat}>+ New Session</Button>
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col bg-gray-50">
-          <div className="flex-1 p-4 overflow-y-auto space-y-4">
+        <main className="flex-1 flex flex-col bg-transparent">
+          <div className="flex-1 p-6 overflow-y-auto space-y-5">
             {messages.length === 0 && !isLoading && (
               <div className="flex justify-center items-center h-full">
-                <div className="text-center text-gray-500">
-                  <div className="text-xl mb-2">👋</div>
-                  <div>Welcome to your AI Financial Assistant!</div>
-                  <div className="text-sm">Start a conversation by typing below.</div>
+                <div className="text-center text-gray-600 p-6 bg-white/80 rounded-xl shadow-xl backdrop-blur-sm">
+                  <div className="text-4xl mb-4">👋</div>
+                  <div className="text-2xl font-bold text-indigo-800 mb-2">Welcome to your AI Financial Assistant!</div>
+                  <div className="text-lg">Start a conversation by typing below.</div>
                 </div>
               </div>
             )}
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`p-3 rounded-lg max-w-lg shadow-sm ${msg.sender === 'user' ? 'bg-black text-white' : 'bg-white border'}`}>
-                  {msg.text}
+                <div className={`p-4 rounded-xl max-w-lg shadow-md ${msg.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border border-gray-200'}`}>
+                  {msg.sender === 'agent' ? (
+                    <FormattedAgentResponse content={msg.text} />
+                  ) : (
+                    msg.text
+                  )}
                 </div>
               </div>
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white border p-3 rounded-lg max-w-md shadow-sm">
+                <div className="bg-white border border-gray-200 p-4 rounded-xl max-w-md shadow-md">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <div className="w-3 h-3 bg-gray-500 rounded-full animate-pulse"></div>
+                    <div className="w-3 h-3 bg-gray-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-3 h-3 bg-gray-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                   </div>
                 </div>
               </div>
@@ -255,7 +319,7 @@ const startNewChat = () => {
             <div ref={chatEndRef} />
           </div>
 
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white flex items-center space-x-2">
+          <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-300 bg-white/70 backdrop-blur-md flex items-center space-x-3 shadow-lg">
             <Input
               placeholder="Type your message..."
               value={inputMessage}
@@ -267,8 +331,11 @@ const startNewChat = () => {
                   handleSendMessage(e);
                 }
               }}
+              className="bg-white/80 border-gray-300 focus:ring-indigo-500 text-gray-800"
             />
-            <Button type="submit" disabled={isLoading || !inputMessage.trim()}>Send</Button>
+            <Button type="submit" disabled={isLoading || !inputMessage.trim()} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md">
+              Send
+            </Button>
           </form>
         </main>
       </div>

@@ -1,0 +1,43 @@
+{
+  "portfolio_summary": {
+    "total_investment": 1900.0,
+    "expected_annual_return": 0.12,
+    "risk_level": "MEDIUM",
+    "max_drawdown": 0.25
+  },
+  "allocations": [
+    {
+      "asset": "ICICI Prudential Nifty Healthcare ETF",
+      "sector": "Healthcare",
+      "allocation_percentage": 0.40
+    },
+    {
+      "asset": "iShares MSCI India Climate Transition ETF",
+      "sector": "ESG",
+      "allocation_percentage": 0.20
+    },
+    {
+      "asset": "Sun Pharmaceutical Industries Ltd",
+      "sector": "Pharmaceuticals",
+      "allocation_percentage": 0.15
+    },
+    {
+      "asset": "Apollo Hospitals Enterprise Ltd",
+      "sector": "Hospital Services",
+      "allocation_percentage": 0.10
+    },
+    {
+      "asset": "Cash",
+      "sector": "Cash",
+      "allocation_percentage": 0.15
+    }
+  ],
+  "sector_allocation": {
+    "Healthcare": 0.55,
+    "ESG": 0.20,
+    "Cash": 0.15,
+    "Pharmaceuticals": 0.15,
+    "Hospital Services": 0.10
+  },
+  "strategy": "This portfolio is designed for a young Indian investor with a medium risk tolerance and a long-term investment horizon, focusing on the Healthcare sector with an ESG overlay. The portfolio includes a mix of ETFs and individual stocks to provide diversification and growth potential, while considering liquidity needs."
+}

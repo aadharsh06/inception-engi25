@@ -1,0 +1,60 @@
+{
+  "portfolio_summary": {
+    "total_investment": 100000.00,
+    "expected_annual_return": 8.50,
+    "risk_level": "Moderate",
+    "max_drawdown": 15.00
+  },
+  "allocations": [
+    {
+      "asset": "iShares ESG Aware MSCI Canada Index ETF (XESG)",
+      "sector": "ESG ETF",
+      "allocation_percentage": 20.00
+    },
+    {
+      "asset": "Brookfield Renewable Partners LP (BEP.UN)",
+      "sector": "Renewable Energy",
+      "allocation_percentage": 10.00
+    },
+    {
+      "asset": "Northland Power Inc (NPI)",
+      "sector": "Renewable Energy",
+      "allocation_percentage": 10.00
+    },
+    {
+      "asset": "WELL Health Technologies (WELL)",
+      "sector": "Healthcare",
+      "allocation_percentage": 10.00
+    },
+    {
+      "asset": "Celestica Inc. (CLS)",
+      "sector": "Technology",
+      "allocation_percentage": 10.00
+    },
+    {
+      "asset": "EQ Bank High-Interest Savings Account",
+      "sector": "Cash",
+      "allocation_percentage": 10.00
+    },
+    {
+      "asset": "Government of Canada 5-Year Bond",
+      "sector": "Bonds",
+      "allocation_percentage": 20.00
+    },
+    {
+      "asset": "Maple Leaf Foods (MFI)",
+      "sector": "Consumer Staples",
+      "allocation_percentage": 10.00
+    }
+  ],
+  "sector_allocation": {
+    "ESG ETF": 20.00,
+    "Renewable Energy": 20.00,
+    "Healthcare": 10.00,
+    "Technology": 10.00,
+    "Cash": 10.00,
+    "Bonds": 20.00,
+    "Consumer Staples": 10.00
+  },
+  "strategy": "This portfolio prioritizes ESG considerations, diversification across sectors, and a balance between growth and income, tailored for a Canadian investor. It includes a mix of ETFs, individual stocks, bonds, and cash to manage risk and provide a moderate level of return."
+}

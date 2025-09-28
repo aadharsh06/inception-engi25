@@ -9,10 +9,14 @@ import re
 import os
 
 app = FastAPI()
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:8000 "
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -23,15 +27,15 @@ app.add_middleware(
 @app.post("/agent/chat")
 async def chat_agent(request: Request):
     data = await request.json()
-    session_id = data.get("sessionId")
-    user_id = data.get("userId")
-    print(data)
+    session_id = str ( data.get("sessionId") )
+    user_id = str ( data.get("userId") )
+    
     path = "./db/{}".format ( str ( user_id ) )
     
     if os.path.exists ( path ) and (session_id in os.listdir ( path )):
-        request = data.get("message")
+        request = ( data.get("data") )['message']
     else:
-        request = data.get("initialPreferenceData")
+        request =  ( data.get("data") )['initialPreferenceData']
         
     response = fetch_response ( request, user_id, session_id )
 

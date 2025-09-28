@@ -162,25 +162,26 @@ def continue_session ( path, request, userid, sessionid ):
 # FastAPI calls this function to get response
 
 def fetch_response ( request, userid, sessionid ):
+    print ( os.listdir ( "./db" ) )
     if userid not in os.listdir ( "./db" ):
         os.mkdir ( "./db/{}".format ( str ( userid ) ) )
 
     path = "./db/{}".format ( str ( userid ) )
 
-    worked = 0
+    worked = 1
     response = "0"
     change_key()
     
-    while ( ( not worked ) and ( response != "" or response != "0" ) ):
+    while ( ( worked and worked != 10 ) and ( response != "" or response != "0" ) ):
         try:
             if sessionid not in os.listdir ( path ):
-                request = get ( request['name'], request['age'], request['location'], request['occupation'], request['investment_experience'], request['goal_type'], request['target_amount'], request['target_years'], request['risk_tolerance'], request['volatility_tolerance'], request['portfolio_style'], request['preferred_sectors'], request['excluded_sectors'], request['initial_investment'], request['liquidity_needs_percentage'] )
                 response = new_session ( path, request, userid, sessionid )
             else:
                 response = continue_session ( path, request, userid, sessionid )
-            worked = 1
+            worked = 0
         except Exception as e:
-            print ( e, "| Trying again.." )
+            print ( "| Trying again.." )
             change_key()
+            worked += 1
 
     return response

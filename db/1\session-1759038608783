@@ -1,0 +1,49 @@
+{
+  "portfolio_summary": {
+    "total_investment": 100000.00,
+    "expected_annual_return": 9.5,
+    "risk_level": "Moderate",
+    "max_drawdown": 15.0
+  },
+  "allocations": [
+    {
+      "asset": "Vanguard FTSE Canada All Cap ETF (VCN)",
+      "sector": "Canadian Equity",
+      "allocation_percentage": 30.0
+    },
+    {
+      "asset": "iShares ESG Aware Canada ETF (XESG)",
+      "sector": "ESG Focused Canadian Equity",
+      "allocation_percentage": 20.0
+    },
+    {
+      "asset": "BMO Aggregate Bond Index ETF (ZAG)",
+      "sector": "Canadian Bonds",
+      "allocation_percentage": 20.0
+    },
+    {
+      "asset": "iShares S&P/TSX Global Gold Index ETF (XGD)",
+      "sector": "Precious Metals",
+      "allocation_percentage": 10.0
+    },
+    {
+      "asset": "Royal Bank of Canada (RY)",
+      "sector": "Financials",
+      "allocation_percentage": 10.0
+    },
+    {
+      "asset": "Cash",
+      "sector": "Cash",
+      "allocation_percentage": 10.0
+    }
+  ],
+  "sector_allocation": {
+    "Canadian Equity": 30.0,
+    "ESG Focused Canadian Equity": 20.0,
+    "Canadian Bonds": 20.0,
+    "Precious Metals": 10.0,
+    "Financials": 10.0,
+    "Cash": 10.0
+  },
+  "strategy": "This portfolio is designed for a Canadian investor with a moderate risk tolerance, focusing on a blend of Canadian equities, bonds, and precious metals, with an emphasis on ESG considerations. It seeks diversification across asset classes and sectors to balance risk and return. The inclusion of individual stock in Royal Bank of Canada provides a blend of stability and growth potential within the Canadian financial sector. The cash allocation provides liquidity and potential for opportunistic investments."
+}
